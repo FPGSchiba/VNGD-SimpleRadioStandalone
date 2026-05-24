@@ -10,6 +10,7 @@ namespace Vanguard.VCS.Client.Network
         ServerResponse UpdateRadioInfo(RadioInfo request, CallOptions options);
         ServerResponse Disconnect(Empty request, CallOptions options);
         ServerSettings GetServerSettings(Empty request, CallOptions options);
+        PingResponse Ping(PingRequest request, CallOptions options);
         AsyncServerStreamingCall<ServerUpdate> SubscribeToUpdates(Empty request, CallOptions options);
     }
 
@@ -37,6 +38,9 @@ namespace Vanguard.VCS.Client.Network
 
         public ServerSettings GetServerSettings(Empty request, CallOptions options)
             => _inner.GetServerSettings(request, options);
+
+        public PingResponse Ping(PingRequest request, CallOptions options)
+            => _inner.Ping(request, options);
 
         public AsyncServerStreamingCall<ServerUpdate> SubscribeToUpdates(Empty request, CallOptions options)
             => _inner.SubscribeToUpdates(request, options);

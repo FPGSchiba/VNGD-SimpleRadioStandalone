@@ -35,6 +35,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
                 ConnectionTimeBlock.Text = "Connection Time: ---";
                 ConnectedAsBlock.Text = "Connected as: ---";
                 LoginTypeBlock.Text = "Login Type: ---";
+                PingBlock.Text = "Ping: --- ms";
                 return;
             }
             
@@ -64,6 +65,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
             
             ConnectedAsBlock.Text = $"Connected as: {ClientStateSingleton.Instance.LastSeenName}";
             LoginTypeBlock.Text = $"Login Type: {_mainWindow.ClientRole}";
+            var pingMs = _mainWindow.LatencyToControlMs;
+            PingBlock.Text = pingMs > 0 ? $"Ping: {pingMs} ms" : "Ping: measuring…";
         }
         
         private void Logout_OnClick(object sender, RoutedEventArgs e)

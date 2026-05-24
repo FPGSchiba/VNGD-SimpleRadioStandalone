@@ -91,6 +91,7 @@ namespace Vanguard.VCS.Client.Network
       //  private Timer _timer;
 
         private long _udpLastReceived = 0; // accessed via Interlocked
+        private long _pendingEchoTimestampRaw = 0; // ulong cast via Interlocked; set by receive loop, consumed by ping loop
         private DispatcherTimer _updateTimer;
 
         private RadioReceivingState[] _radioReceivingState;
@@ -252,6 +253,15 @@ namespace Vanguard.VCS.Client.Network
                     {
                         case VcsVoicePacketType.Keepalive:
                             Logger.Debug("Received Keepalive Packet from Server");
+                            if (udpVoicePacket.Payload?.Length >= 8)
+                            {
+                                var p = udpVoicePacket.Payload;
+                                var ts = ((ulong)p[0] << 56) | ((ulong)p[1] << 48)
+                                       | ((ulong)p[2] << 40) | ((ulong)p[3] << 32)
+                                       | ((ulong)p[4] << 24) | ((ulong)p[5] << 16)
+                                       | ((ulong)p[6] << 8)  |  (ulong)p[7];
+                                Interlocked.Exchange(ref _pendingEchoTimestampRaw, (long)ts);
+                            }
                             break;
                         case VcsVoicePacketType.Hello:
                         case VcsVoicePacketType.HelloAck:
@@ -619,10 +629,10 @@ namespace Vanguard.VCS.Client.Network
         {
             Logger.Info("Pinging Server - Starting");
 
-            var message = VcsVoicePacket.CreateKeepalivePacket(_guid).EncodePacket();
+            var initialMessage = VcsVoicePacket.CreateKeepalivePacket(_guid).EncodePacket();
 
             // Force immediate ping once to avoid race condition before starting to listen
-            _listener.Send(message, message.Length, _serverEndpoint);
+            _listener.Send(initialMessage, initialMessage.Length, _serverEndpoint);
 
             var thread = new Thread(() =>
             {
@@ -638,13 +648,16 @@ namespace Vanguard.VCS.Client.Network
                 {
                     try
                     {
-                        _listener?.Send(message, message.Length,_serverEndpoint);
+                        // Atomically claim any echo timestamp the receive loop stored
+                        var echoTs = (ulong)Interlocked.Exchange(ref _pendingEchoTimestampRaw, 0L);
+                        var message = VcsVoicePacket.CreateKeepalivePacket(_guid, echoTs).EncodePacket();
+                        _listener?.Send(message, message.Length, _serverEndpoint);
                     }
                     catch (Exception e)
                     {
                         Logger.Error(e, "Exception Sending Audio Ping! " + e.Message);
                     }
-                    
+
                     var cancelled = _pingStop.Token.WaitHandle.WaitOne(TimeSpan.FromSeconds(15));
 
                     if (cancelled)
@@ -671,6 +684,7 @@ namespace Vanguard.VCS.Client.Network
                         _listener = null;
 
                         Interlocked.Exchange(ref _udpLastReceived, 0);
+                        Interlocked.Exchange(ref _pendingEchoTimestampRaw, 0L);
 
                         _listener = new UdpClient();
                         try
@@ -684,17 +698,17 @@ namespace Vanguard.VCS.Client.Network
 
                         try
                         {
-                            // Force immediate ping once to avoid race condition before starting to listen
-                            _listener.Send(message, message.Length, _serverEndpoint);
+                            var reconnectMessage = VcsVoicePacket.CreateKeepalivePacket(_guid).EncodePacket();
+                            _listener.Send(reconnectMessage, reconnectMessage.Length, _serverEndpoint);
                             _ready = true;
                             Logger.Error("VoIP Timeout - Success Recreating VoIP Connection");
                         }
                         catch (Exception e) {
                             Logger.Error(e, "Exception Sending Audio Ping! " + e.Message);
                         }
-                        
+
                     }
-                   
+
                 }
             });
             thread.Start();

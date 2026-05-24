@@ -82,6 +82,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         private string _coalitionPassword = "";
         public VcsRole ClientRole { get; private set; }
         public DateTime ConnectedAt { get; private set; }
+        public long LatencyToControlMs => _vcsClient?.LatencyToControlMs ?? 0;
 
         private int OpenPage
         {

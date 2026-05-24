@@ -112,8 +112,10 @@ namespace Vanguard.VCS.Client.Network
         private Metadata _authenticationMetadata = new Metadata();
         private string _tempSecret = string.Empty;
         public string ServerVersion { get; private set; } = "0.0.0"; // Default version
+        public long LatencyToControlMs => Interlocked.Read(ref _pingRttMs);
         private CancellationTokenSource _streamCts;
         private Task _subscriptionTask;
+        private long _pingRttMs = 0;
 
         public VcsClientSyncHandler(UpdateUiCallback uiCallback, IEventBus eventBus, RadioStateManager radioStateManager)
         {
@@ -776,6 +778,39 @@ namespace Vanguard.VCS.Client.Network
             _subscriptionTask.ContinueWith(
                 t => Logger.Error(t.Exception, "Subscription loop faulted unexpectedly"),
                 TaskContinuationOptions.OnlyOnFaulted);
+            _ = RunPingLoopAsync(_streamCts.Token);
+        }
+
+        private async Task RunPingLoopAsync(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(15), cancellationToken);
+                    var rttToReport = Interlocked.Read(ref _pingRttMs);
+                    var sentAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    _srsServiceClient.Ping(
+                        new PingRequest { LastRttMs = rttToReport },
+                        new CallOptions(
+                            headers: _authenticationMetadata,
+                            deadline: DateTime.UtcNow.AddSeconds(10),
+                            cancellationToken: cancellationToken));
+                    Interlocked.Exchange(ref _pingRttMs, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - sentAt);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+                catch (RpcException ex) when (ex.StatusCode is StatusCode.Cancelled or StatusCode.Unavailable)
+                {
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn(ex, "Ping RPC failed, will retry next cycle");
+                }
+            }
         }
 
         private void RunSubscriptionLoop(CancellationToken cancellationToken)

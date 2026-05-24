@@ -141,46 +141,6 @@
             </Border>
         </StackPanel>
 
-        <!-- Connecting overlay — spans rows 1-3, covers cards+error+button -->
-        <Grid
-            x:Name="ConnectingPanel"
-            Grid.Row="1"
-            Grid.RowSpan="3"
-            Background="White"
-            Visibility="Collapsed">
-            <StackPanel
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                Margin="0,0,0,30">
-                <ProgressBar
-                    Style="{StaticResource MaterialDesignCircularProgressBar}"
-                    Value="0"
-                    IsIndeterminate="True"
-                    Width="28"
-                    Height="28"
-                    HorizontalAlignment="Center"
-                    Margin="0,0,0,10" />
-                <TextBlock
-                    x:Name="ConnectingLabel"
-                    Text="Connecting to server…"
-                    FontSize="10"
-                    FontWeight="SemiBold"
-                    Foreground="#333"
-                    TextAlignment="Center" />
-            </StackPanel>
-            <Button
-                x:Name="CancelButton"
-                Content="CANCEL"
-                Width="100"
-                Height="30"
-                VerticalAlignment="Bottom"
-                HorizontalAlignment="Center"
-                Margin="0,0,0,10"
-                Style="{StaticResource MaterialDesignFlatDarkBgButton}"
-                materialDesign:ButtonAssist.CornerRadius="15"
-                Click="Cancel_Click" />
-        </Grid>
-
         <!-- Row 2: Error panel -->
         <Border
             x:Name="ErrorPanel"
@@ -219,10 +179,50 @@
                 TextAlignment="Center"
                 Foreground="#aaa"
                 FontSize="9"
-                TextWrapping="WrapWithOverflow">
+                TextWrapping="Wrap">
                 Disclaimer: Vanguard is an organization in the Star Citizen universe and gaming community.
                 We are not affiliated with Roberts Space Industries, Star Citizen, or any other entity.
             </TextBlock>
         </Label>
+
+        <!-- Connecting overlay — defined last so it renders above cards, error, and connect button -->
+        <Grid
+            x:Name="ConnectingPanel"
+            Grid.Row="1"
+            Grid.RowSpan="3"
+            Background="White"
+            Visibility="Collapsed">
+            <StackPanel
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Margin="0,0,0,30">
+                <ProgressBar
+                    Style="{StaticResource MaterialDesignCircularProgressBar}"
+                    Value="0"
+                    IsIndeterminate="True"
+                    Width="28"
+                    Height="28"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,10" />
+                <TextBlock
+                    x:Name="ConnectingLabel"
+                    Text="Connecting to server…"
+                    FontSize="10"
+                    FontWeight="SemiBold"
+                    Foreground="#333"
+                    TextAlignment="Center" />
+            </StackPanel>
+            <Button
+                x:Name="CancelButton"
+                Content="CANCEL"
+                Width="100"
+                Height="30"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Center"
+                Margin="0,0,0,10"
+                Style="{StaticResource MaterialDesignFlatDarkBgButton}"
+                materialDesign:ButtonAssist.CornerRadius="15"
+                Click="Cancel_Click" />
+        </Grid>
     </Grid>
 </Page>

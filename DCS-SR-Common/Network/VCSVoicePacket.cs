@@ -310,12 +310,26 @@ namespace Vanguard.VCS.Common.Network
         /// <param name="sessionId">Client session ID</param>
         /// <param name="sequence">Sequence number</param>
         /// <returns>BYE packet</returns>
-        public static VcsVoicePacket CreateKeepalivePacket(Guid sessionId)
+        public static VcsVoicePacket CreateKeepalivePacket(Guid sessionId, ulong echoTimestamp = 0)
         {
+            byte[] payload = Array.Empty<byte>();
+            if (echoTimestamp != 0)
+            {
+                payload = new byte[8];
+                payload[0] = (byte)(echoTimestamp >> 56);
+                payload[1] = (byte)(echoTimestamp >> 48);
+                payload[2] = (byte)(echoTimestamp >> 40);
+                payload[3] = (byte)(echoTimestamp >> 32);
+                payload[4] = (byte)(echoTimestamp >> 24);
+                payload[5] = (byte)(echoTimestamp >> 16);
+                payload[6] = (byte)(echoTimestamp >> 8);
+                payload[7] = (byte)(echoTimestamp);
+            }
             return new VcsVoicePacket
             {
                 ClientId = sessionId,
                 Type = VcsVoicePacketType.Keepalive,
+                Payload = payload,
             };
         }
 

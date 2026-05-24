@@ -42,6 +42,9 @@ service SRSService {
   // Server settings request
   rpc GetServerSettings(Empty) returns (ServerSettings);
 
+  // Latency probe — client calls periodically and reports its measured RTT
+  rpc Ping(PingRequest) returns (PingResponse);
+
   // Server-to-client updates stream
   rpc SubscribeToUpdates(Empty) returns (stream ServerUpdate);
 }
@@ -255,10 +258,11 @@ message FrequencyRange {
 message ServerUpdate {
   UpdateType type = 1;
   oneof update {
-    ClientUpdate client_update = 2;
-    ServerAction server_action = 3;
-    ServerSettings settings_update = 4;
-    DistributionUpdate voice_hosts = 5; // For distribution updates
+    ClientUpdate      client_update        = 2;
+    ServerAction      server_action        = 3;
+    ServerSettings    settings_update      = 4;
+    DistributionUpdate voice_hosts         = 5; // For distribution updates
+    VoiceAddressUpdate voice_address_update = 6; // Per-client voice-server redirect after rebalance
   }
 
   enum UpdateType {
@@ -269,8 +273,14 @@ message ServerUpdate {
     CLIENT_INFO_UPDATE = 4;
     SERVER_SETTINGS_CHANGED = 5;
     SERVER_ACTION = 6;
-    DISTRIBUTION_UPDATE = 7; // For distribution updates
+    DISTRIBUTION_UPDATE = 7;
+    VOICE_ADDRESS_UPDATE = 8; // Tells the client to reconnect to a different voice UDP endpoint
   }
+}
+
+message VoiceAddressUpdate {
+  string coalition_voice_addr = 1; // new UDP host:port for the client's coalition
+  string global_voice_addr    = 2; // current global voice node address
 }
 
 message DistributionUpdate {
@@ -354,13 +364,24 @@ message SyncResponse {
 }
 
 message ServerSyncResult {
-  map<string, ClientInfo> clients = 1; // List of clients currently connected
-  map<string, RadioInfo> radios = 2; // List of radio information
-  ServerSettings settings = 3; // Current server settings
+  map<string, ClientInfo> clients              = 1; // List of clients currently connected
+  map<string, RadioInfo>  radios               = 2; // List of radio information
+  ServerSettings          settings             = 3; // Current server settings
+  string                  coalition_voice_addr = 4; // UDP host:port for coalition audio
+  string                  global_voice_addr    = 5; // UDP host:port for global freq audio
 }
 
 // Generic server response
 message ServerResponse {
   bool success = 1;
   string error_message = 2;
+}
+
+// Latency probe
+message PingRequest {
+  int64 last_rtt_ms = 1; // RTT measured by the client on the previous Ping cycle
+}
+
+message PingResponse {
+  int64 server_time_ms = 1; // server Unix timestamp in ms at time of processing
 }
