@@ -38,17 +38,18 @@ public partial class CustomServer : Page
     
     private void Back_OnClick(object sender, RoutedEventArgs e)
     {
+        // CustomServer page is superseded by ServerSelectPage; navigate back to server selection
         Continue.IsEnabled = false;
-        _mainWindow?.On_CustomServerBackClicked();
+        _mainWindow?.On_ServerSelectCancelled();
     }
-    
+
     private void Connect_OnClick(object sender, RoutedEventArgs e)
     {
         ConnectInProgress.Visibility = Visibility.Visible;
         IpInput.IsEnabled = false;
         PortInput.IsEnabled = false;
         Connect.IsEnabled = false;
-        
+
         try
         {
             var resolvedAddresses = Dns.GetHostAddresses(IpInput.Text);
@@ -64,7 +65,7 @@ public partial class CustomServer : Page
             _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, endpoint.Address.ToString());
             Dispatcher.Invoke(() =>
             {
-                _mainWindow.On_FetchedServerInformation(endpoint, true);
+                _mainWindow?.On_ServerConnectClicked(endpoint, isCustom: true);
                 ConnectionSuccessful();
             });
         }
@@ -82,10 +83,10 @@ public partial class CustomServer : Page
             ConnectionFailed();
         }
     }
-    
+
     private void Continue_OnClick(object sender, RoutedEventArgs e)
     {
-        _mainWindow?.On_CustomServerContinueClicked();
+        // No-op: superseded by ServerSelectPage flow
     }
     
     private void ConnectionSuccessful()

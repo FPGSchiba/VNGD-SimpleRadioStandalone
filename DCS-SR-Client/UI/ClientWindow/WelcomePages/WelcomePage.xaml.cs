@@ -52,6 +52,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
             => _mainWindow?.On_WelcomeLoginClicked();
 
         private void GuestCard_Click(object sender, MouseButtonEventArgs e)
-            => _mainWindow?.On_WelcomeGuestCLicked();   // typo preserved until Task 3 renames it
+            => _mainWindow?.On_WelcomeGuestClicked();
     }
 }

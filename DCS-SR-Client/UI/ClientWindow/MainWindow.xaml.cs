@@ -40,7 +40,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 {
     public enum ConnectionStep
     {
-        Connect,
+        ServerSelect,
+        Auth,
         GuestLogin,
         MemberLogin,
         UnitSelection,
@@ -60,7 +61,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         public readonly AudioManager AudioManager;
 
         private Guid _guid;
-        private bool _usingCustomServer;
+        private string _connectedServerAddress = "";
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private AudioPreview _audioPreview;
         private VcsClientSyncHandler _vcsClient;
@@ -141,8 +142,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         private UnitSelectionPage _unitSelectionPage;
         private const int UnitSelectionIndex = 7;
         
-        private CustomServer _customServerPage;
-        private const int CustomServerIndex = 8;
+        private ServerSelectPage _serverSelectPage;
+        private const int ServerSelectPageIndex = 8;
 
         // Sentry Transactions
         private ITransactionTracer _connectionTransaction;
@@ -229,8 +230,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
             // Initialize Pages
             InitPages();
-
-            DisplayFrame.Content = _welcomePage;
 
             // Initialize ToolTip controls
             ToolTips.Init();
@@ -552,7 +551,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         private void InitPages()
         {
-            
+            _serverSelectPage = new ServerSelectPage();
             _welcomePage = new WelcomePage();
             _supportPage = new SupportPage();
             _loginPage = new LoginPage();
@@ -561,9 +560,9 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _homePage = new HomePage();
             _settingsPage = new SettingsPage();
             _unitSelectionPage = new UnitSelectionPage();
-            _customServerPage = new CustomServer();
-            OpenPage = WelcomeIndex;
-                
+            DisplayFrame.Content = _serverSelectPage;
+            OpenPage = ServerSelectPageIndex;
+
             HomeNavigation.IsEnabled = false;
             HomeNavigation.Visibility = Visibility.Hidden;
         }
@@ -607,8 +606,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 case UnitSelectionIndex:
                     DisplayFrame.Content = _unitSelectionPage;
                     break;
-                case CustomServerIndex:
-                    DisplayFrame.Content = _customServerPage;
+                case ServerSelectPageIndex:
+                    DisplayFrame.Content = _serverSelectPage;
                     break;
                 default:
                     _logger.Error($"Page: {index} could not be found.");
@@ -620,10 +619,14 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         private static void OpenPagePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
-            if (source is MainWindow mainWindow && Convert.ToInt32(e.NewValue) == WelcomeIndex)
+            if (source is MainWindow mainWindow)
             {
-                mainWindow.HomeNavigation.IsEnabled = false;
-                mainWindow.HomeNavigation.Visibility = Visibility.Hidden;
+                var index = Convert.ToInt32(e.NewValue);
+                if (index == WelcomeIndex || index == ServerSelectPageIndex)
+                {
+                    mainWindow.HomeNavigation.IsEnabled = false;
+                    mainWindow.HomeNavigation.Visibility = Visibility.Hidden;
+                }
             }
         }
 
@@ -632,7 +635,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             UpdateStepperHeader(step);
             switch (step)
             {
-                case ConnectionStep.Connect:
+                case ConnectionStep.ServerSelect:
+                    OpenPageByIndex(ServerSelectPageIndex);
+                    _serverSelectPage.ShowIdle();
+                    break;
+                case ConnectionStep.Auth:
                     if (_pendingKickReason != null)
                     {
                         _welcomePage.ShowKickReason(_pendingKickReason);
@@ -657,11 +664,18 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         private void UpdateStepperHeader(ConnectionStep step)
         {
+            if (step == ConnectionStep.ServerSelect)
+            {
+                StepperHeader.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            StepperHeader.Visibility = Visibility.Visible;
             StepperPanel.Children.Clear();
 
-            var steps = (step == ConnectionStep.GuestLogin || step == ConnectionStep.Connect)
-                ? new[] { ("Connect", ConnectionStep.Connect), ("Guest Login", ConnectionStep.GuestLogin), ("Ready", ConnectionStep.Ready) }
-                : new[] { ("Connect", ConnectionStep.Connect), ("Login", ConnectionStep.MemberLogin), ("Select Unit", ConnectionStep.UnitSelection), ("Ready", ConnectionStep.Ready) };
+            var steps = (step == ConnectionStep.GuestLogin || step == ConnectionStep.Auth)
+                ? new[] { ("Server", ConnectionStep.Auth), ("Guest Login", ConnectionStep.GuestLogin), ("Ready", ConnectionStep.Ready) }
+                : new[] { ("Server", ConnectionStep.Auth), ("Login", ConnectionStep.MemberLogin), ("Select Unit", ConnectionStep.UnitSelection), ("Ready", ConnectionStep.Ready) };
 
             for (int i = 0; i < steps.Length; i++)
             {
@@ -705,11 +719,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         public void On_WelcomeLoginClicked() => NavigateToStep(ConnectionStep.MemberLogin);
 
-        public void On_WelcomeGuestCLicked() => NavigateToStep(ConnectionStep.GuestLogin);
+        public void On_WelcomeGuestClicked() => NavigateToStep(ConnectionStep.GuestLogin);
 
         public void On_ServerConnectClicked(IPEndPoint endpoint, bool isCustom)
         {
-            _usingCustomServer = isCustom;
+            _connectedServerAddress = isCustom ? $"{endpoint.Address}:{endpoint.Port}" : "Vanguard VCS Server";
             _resolvedIp = endpoint.Address;
             _port = endpoint.Port;
             Connect(endpoint.Address, endpoint.Port);
@@ -720,21 +734,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             Stop();
         }
 
-        public void On_FetchedServerInformation(IPEndPoint endpoint, bool usingCustomServer = false)
-        {
-            _usingCustomServer = usingCustomServer;
-            _resolvedIp = endpoint.Address;
-            _port = endpoint.Port;
-
-            Connect(endpoint.Address, endpoint.Port);
-        }
-        
-        public void On_WelcomeCustomServerClicked()
-        {
-            Stop(); // Stop current connection and open a custom connection
-            OpenPageByIndex(CustomServerIndex);
-        }
-        
         public void On_LoginLoginClicked(string email, string password)
         {
             Login(new UserLogin() { Username = email, Password = password, LoginType = LoginRequestType.Internal});
@@ -743,7 +742,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         public void On_LoginBackClicked()
         {
             Stop();
-            NavigateToStep(ConnectionStep.Connect);
+            NavigateToStep(ConnectionStep.Auth);
         }
 
         public void On_GuestLoginClicked(string playerName, string fleetCode, string coalitionPassword)
@@ -761,7 +760,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         public void On_GuestBackClicked()
         {
-            OpenPageByIndex(_usingCustomServer ? CustomServerIndex : WelcomeIndex);
+            NavigateToStep(ConnectionStep.Auth);
         }
 
         public void On_GuestSuccessAcceptClicked()
@@ -769,21 +768,10 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             OpenPageByIndex(HomePageIndex);
         }
 
-        public void On_CustomServerBackClicked()
-        {
-            Stop();
-            OpenPageByIndex(WelcomeIndex);
-        }
-
-        public void On_CustomServerContinueClicked()
-        {
-            OpenPageByIndex(GuestIndex);
-        }
-        
         public void On_UnitSelectionBackClicked()
         {
             Stop();
-            NavigateToStep(ConnectionStep.Connect);
+            NavigateToStep(ConnectionStep.ServerSelect);
         }
         
         public void On_UnitSelectionContinueClicked(string unitId, string coalition, uint roleId)
@@ -794,7 +782,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         public void On_HomeLogOutClicked()
         {
             Stop();
-            OpenPageByIndex(WelcomeIndex);
+            NavigateToStep(ConnectionStep.ServerSelect);
         }
 
         private void SupportNavigation_Click(object sender, RoutedEventArgs e)
@@ -865,7 +853,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         {
             _pendingKickReason = reason;
             Stop(connectionError: true);
-            NavigateToStep(ConnectionStep.Connect);
+            NavigateToStep(ConnectionStep.ServerSelect);
         }
 
         private void HandleServerMuteChanged(bool isMuted)
@@ -1025,8 +1013,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             var errorMsg = message as string ?? "An unknown connection error occurred.";
             _logger.Error($"Connection error: {errorMsg}");
             Stop(true);
-            _welcomePage.ShowError(errorMsg);
-            NavigateToStep(ConnectionStep.Connect);
+            NavigateToStep(ConnectionStep.ServerSelect);
+            _serverSelectPage.ShowError(errorMsg);
         }
 
         private void HandleInitializationError(object message)
@@ -1034,8 +1022,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             var errorMsg = message as string ?? "An unknown initialization error occurred.";
             _logger.Error($"Initialization error: {errorMsg}");
             Stop(true);
-            _welcomePage.ShowError(errorMsg);
-            NavigateToStep(ConnectionStep.Connect);
+            NavigateToStep(ConnectionStep.ServerSelect);
+            _serverSelectPage.ShowError(errorMsg);
         }
         
         private void HandleInitializationSuccessEvent(object message)
@@ -1051,8 +1039,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             {
                 _logger.Error("Initialization error with no message provided.");
                 Stop(true);
-                _welcomePage.ShowError("An unknown initialization error occurred.");
-                NavigateToStep(ConnectionStep.Connect);
+                NavigateToStep(ConnectionStep.ServerSelect);
+                _serverSelectPage.ShowError("An unknown initialization error occurred.");
             }
         }
         
@@ -1069,8 +1057,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             {
                 _logger.Error("Connection error with no message provided.");
                 Stop(true);
-                _welcomePage.ShowError("An unknown connection error occurred.");
-                NavigateToStep(ConnectionStep.Connect);
+                NavigateToStep(ConnectionStep.ServerSelect);
+                _serverSelectPage.ShowError("An unknown connection error occurred.");
             }
         }
         
@@ -1242,17 +1230,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         {
             _logger.Info("Initialization successful, setting up UI");
             ConnectionStatus.Fill = Brushes.Orange;
-            if (_usingCustomServer)
-            {
-                OpenPageByIndex(CustomServerIndex);
-            }
-            else
-            {
-                _welcomePage.SetLoginEnabled(isVanguardLoginEnabled);
-                _welcomePage.SetGuestEnabled(isGuestLoginEnabled);
-                StepperHeader.Visibility = Visibility.Visible;
-                NavigateToStep(ConnectionStep.Connect);
-            }
+            _welcomePage.SetLoginEnabled(isVanguardLoginEnabled);
+            _welcomePage.SetGuestEnabled(isGuestLoginEnabled);
+            _welcomePage.ShowServerConnected(_connectedServerAddress);
+            StepperHeader.Visibility = Visibility.Visible;
+            NavigateToStep(ConnectionStep.Auth);
         }
         
         private void HandleGuestLoginSuccess()
